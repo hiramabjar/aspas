@@ -41,21 +41,22 @@ model Session {
 }
 
 model User {
-  id              String    @id @default(cuid())
-  name            String
-  email           String    @unique
-  emailVerified   DateTime?
-  image           String?
-  hashedPassword  String?
-  role            String    @default("student")
-  active          Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  accounts        Account[]
-  sessions        Session[]
+  id               String             @id @default(cuid())
+  name             String
+  email            String             @unique
+  emailVerified    DateTime?
+  image            String?
+  hashedPassword   String?
+  role             String             @default("student")
+  active           Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  accounts         Account[]
+  sessions         Session[]
   exerciseAttempts ExerciseAttempt[]
   exerciseProgress ExerciseProgress[]
   moduleProgress   ModuleProgress[]
+  studentProfile   StudentProfile?    @relation("UserToStudentProfile")
 }
 
 model VerificationToken {
@@ -68,7 +69,7 @@ model VerificationToken {
 
 model StudentProfile {
   id          String       @id @default(cuid())
-  user        User         @relation(fields: [userId], references: [id])
+  user        User         @relation("UserToStudentProfile", fields: [userId], references: [id])
   userId      String       @unique
   enrollments Enrollment[]
   createdAt   DateTime     @default(now())
@@ -76,30 +77,32 @@ model StudentProfile {
 }
 
 model Language {
-  id        String     @id @default(cuid())
-  name      String     @unique
-  code      String     @unique
-  exercises Exercise[]
+  id          String       @id @default(cuid())
+  name        String       @unique
+  code        String       @unique
+  exercises   Exercise[]   @relation("LanguageToExercise")
+  enrollments Enrollment[] @relation("LanguageToEnrollment")
 }
 
 model Level {
-  id        String     @id @default(cuid())
-  name      String     @unique
-  code      String     @unique
-  exercises Exercise[]
+  id          String       @id @default(cuid())
+  name        String       @unique
+  code        String       @unique
+  exercises   Exercise[]   @relation("LevelToExercise")
+  enrollments Enrollment[] @relation("LevelToEnrollment")
 }
 
 model Enrollment {
-  id              String         @id @default(cuid())
-  student         StudentProfile @relation(fields: [studentProfileId], references: [id])
+  id               String         @id @default(cuid())
+  student          StudentProfile @relation(fields: [studentProfileId], references: [id])
   studentProfileId String
-  language        Language       @relation(fields: [languageId], references: [id])
-  languageId      String
-  level           Level          @relation(fields: [levelId], references: [id])
-  levelId         String
-  status          String         @default("ACTIVE")
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  language         Language       @relation("LanguageToEnrollment", fields: [languageId], references: [id])
+  languageId       String
+  level            Level          @relation("LevelToEnrollment", fields: [levelId], references: [id])
+  levelId          String
+  status           String         @default("ACTIVE")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@index([studentProfileId])
   @@index([languageId])
@@ -111,29 +114,33 @@ model Module {
   name           String
   description    String?
   order          Int
-  exercises      Exercise[]
-  moduleProgress ModuleProgress[]
+  exercises      Exercise[]       @relation("ModuleToExercise")
+  moduleProgress ModuleProgress[] @relation("ModuleToModuleProgress")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 }
 
 model Exercise {
-  id          String    @id @default(cuid())
+  id          String             @id @default(cuid())
   title       String
   description String
   content     String
-  type        String    // reading, listening, dictation
+  type        String // reading, listening, dictation
   languageId  String
   levelId     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  language    Language  @relation(fields: [languageId], references: [id])
-  level       Level     @relation(fields: [levelId], references: [id])
-  attempts    ExerciseAttempt[]
-  progress    ExerciseProgress[]
+  moduleId    String?
+  module      Module?            @relation("ModuleToExercise", fields: [moduleId], references: [id])
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  language    Language           @relation("LanguageToExercise", fields: [languageId], references: [id])
+  level       Level              @relation("LevelToExercise", fields: [levelId], references: [id])
+  attempts    ExerciseAttempt[]  @relation("ExerciseToAttempt")
+  progress    ExerciseProgress[] @relation("ExerciseToProgress")
+  questions   Question[]         @relation("ExerciseToQuestion")
 
   @@index([languageId])
   @@index([levelId])
+  @@index([moduleId])
 }
 
 model ExerciseAttempt {
@@ -149,47 +156,48 @@ model ExerciseAttempt {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   user        User      @relation(fields: [userId], references: [id])
-  exercise    Exercise  @relation(fields: [exerciseId], references: [id])
+  exercise    Exercise  @relation("ExerciseToAttempt", fields: [exerciseId], references: [id])
 
   @@index([userId])
   @@index([exerciseId])
 }
 
 model ExerciseProgress {
-  id          String   @id @default(cuid())
-  userId      String
-  exerciseId  String
-  status      String   @default("NOT_STARTED")
-  score       Float?
-  startedAt   DateTime @default(now())
-  finishedAt  DateTime?
-  user        User     @relation(fields: [userId], references: [id])
-  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+  id         String    @id @default(cuid())
+  userId     String
+  exerciseId String
+  status     String    @default("NOT_STARTED")
+  score      Float?
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  user       User      @relation(fields: [userId], references: [id])
+  exercise   Exercise  @relation("ExerciseToProgress", fields: [exerciseId], references: [id])
 
   @@index([userId])
   @@index([exerciseId])
 }
 
 model ModuleProgress {
-  id        String   @id @default(cuid())
-  userId    String
-  moduleId  String
-  progress  Float    @default(0)
-  user      User     @relation(fields: [userId], references: [id])
+  id       String @id @default(cuid())
+  userId   String
+  moduleId String
+  progress Float  @default(0)
+  user     User   @relation(fields: [userId], references: [id])
+  module   Module @relation("ModuleToModuleProgress", fields: [moduleId], references: [id])
 
   @@index([userId])
+  @@index([moduleId])
 }
 
 model Question {
   id            String   @id @default(cuid())
   exerciseId    String
   question      String
-  options       String   // JSON string of options array
+  options       String // JSON string of options array
   correctAnswer String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exercise      Exercise @relation("ExerciseToQuestion", fields: [exerciseId], references: [id], onDelete: Cascade)
 
   @@index([exerciseId])
-} 
+}
