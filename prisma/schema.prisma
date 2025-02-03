@@ -134,7 +134,7 @@ model Exercise {
   updatedAt   DateTime           @updatedAt
   language    Language           @relation("LanguageToExercise", fields: [languageId], references: [id])
   level       Level              @relation("LevelToExercise", fields: [levelId], references: [id])
-  attempts    ExerciseAttempt[]  @relation("ExerciseToAttempt")
+  attempts    ExerciseAttempt[]
   progress    ExerciseProgress[] @relation("ExerciseToProgress")
   questions   Question[]         @relation("ExerciseToQuestion")
 
@@ -149,7 +149,7 @@ model ExerciseAttempt {
   exerciseId  String
   score       Float
   completed   Boolean   @default(false)
-  answers     String    // JSON string
+  answers     String // JSON string
   duration    Int       @default(0) // Duração em minutos
   startedAt   DateTime  @default(now())
   completedAt DateTime?
