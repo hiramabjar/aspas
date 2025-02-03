@@ -9,16 +9,6 @@ const nextConfig = {
   images: {
     domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
-  // Disable static exports for API routes
-  exportPathMap: async function() {
-    return {
-      '/': { page: '/' },
-      '/auth/login': { page: '/auth/login' },
-      '/auth/register': { page: '/auth/register' },
-      '/unauthorized': { page: '/unauthorized' }
-    }
-  },
-  // Add dynamic route handling
   async headers() {
     return [
       {
