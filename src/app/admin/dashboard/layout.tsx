@@ -1,7 +1,7 @@
 import { DashboardLayout } from '@/components/layouts/DashboardLayout'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/features/auth/authOptions'
+import { authOptions } from '@/lib/auth/auth-options'
 
 export default async function AdminLayout({
   children,

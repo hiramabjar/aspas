@@ -5,6 +5,51 @@ import { useRouter } from 'next/navigation'
 import { ExerciseForm } from '@/components/exercises/ExerciseForm'
 import type { ExerciseWithRelations } from '@/types/exercise'
 
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Carregando exercício...</p>
+      </div>
+    </div>
+  )
+}
+
+function ErrorState({ error, onBack }: { error: string; onBack: () => void }) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Erro</h1>
+        <p className="text-gray-600 mb-4">{error}</p>
+        <button
+          onClick={onBack}
+          className="text-blue-600 hover:text-blue-700"
+        >
+          Voltar
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function NotFoundState({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-800">Exercício não encontrado</h1>
+        <p className="mt-2 text-gray-600">O exercício que você está procurando não existe.</p>
+        <button
+          onClick={onBack}
+          className="mt-4 text-blue-600 hover:text-blue-700"
+        >
+          Voltar
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function EditExercisePage() {
   const router = useRouter()
   const [exercise, setExercise] = useState<ExerciseWithRelations | null>(null)
@@ -53,6 +98,31 @@ export default function EditExercisePage() {
     router.push('/admin/dashboard/exercises')
   }
 
+  const handleSubmit = async (data: any) => {
+    try {
+      const pathParts = window.location.pathname.split('/')
+      const exerciseId = pathParts[pathParts.indexOf('exercises') + 1]
+      
+      const response = await fetch(`/api/admin/exercises/${exerciseId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erro ao atualizar exercício')
+      }
+
+      handleSuccess()
+    } catch (err) {
+      console.error('Erro ao atualizar exercício:', err)
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar exercício')
+    }
+  }
+
   if (loading) return <LoadingState />
   if (error) return <ErrorState error={error} onBack={() => router.back()} />
   if (!exercise) return <NotFoundState onBack={() => router.back()} />
@@ -64,53 +134,9 @@ export default function EditExercisePage() {
       </h1>
       <ExerciseForm 
         exercise={exercise}
+        onSubmit={handleSubmit}
         onSuccess={handleSuccess}
       />
-    </div>
-  )
-}
-
-function LoadingState() {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Carregando exercício...</p>
-      </div>
-    </div>
-  )
-}
-
-function ErrorState({ error, onBack }: { error: string; onBack: () => void }) {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">Erro</h1>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <button
-          onClick={onBack}
-          className="text-blue-600 hover:text-blue-700"
-        >
-          Voltar
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function NotFoundState({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-800">Exercício não encontrado</h1>
-        <p className="mt-2 text-gray-600">O exercício que você está procurando não existe.</p>
-        <button
-          onClick={onBack}
-          className="mt-4 text-blue-600 hover:text-blue-700"
-        >
-          Voltar
-        </button>
-      </div>
     </div>
   )
 } 

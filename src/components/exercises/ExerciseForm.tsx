@@ -31,9 +31,10 @@ type ExerciseFormData = z.infer<typeof exerciseSchema>
 interface ExerciseFormProps {
   exercise?: Exercise
   onSubmit: (data: ExerciseFormData) => Promise<void>
+  onSuccess?: () => void
 }
 
-export function ExerciseForm({ exercise, onSubmit }: ExerciseFormProps) {
+export function ExerciseForm({ exercise, onSubmit, onSuccess }: ExerciseFormProps) {
   const [questions, setQuestions] = useState<any[]>(
     exercise?.questions.map(q => ({
       ...q,
@@ -102,6 +103,7 @@ export function ExerciseForm({ exercise, onSubmit }: ExerciseFormProps) {
       }))
     }
     await onSubmit(formattedData)
+    onSuccess?.()
   }
 
   const exerciseType = exercise?.type || 'reading'

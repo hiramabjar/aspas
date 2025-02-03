@@ -24,18 +24,22 @@ const listeningExerciseSchema = z.object({
   content: z.string().min(1, 'Texto para áudio é obrigatório'),
   languageId: z.string().min(1, 'Idioma é obrigatório'),
   levelId: z.string().min(1, 'Nível é obrigatório'),
+  moduleId: z.string().min(1, 'Módulo é obrigatório'),
   questions: z.array(questionSchema).min(1, 'Pelo menos uma questão é obrigatória')
 })
 
 type ListeningExerciseFormData = z.infer<typeof listeningExerciseSchema>
 
+export type { ListeningExerciseFormData }
+
 interface ListeningExerciseFormProps {
+  modules: { id: string; name: string }[]
   languages: { id: string; name: string }[]
   levels: { id: string; name: string }[]
-  onSubmit: (data: ListeningExerciseFormData & { moduleId: string }) => Promise<void>
+  onSubmit: (data: ListeningExerciseFormData) => Promise<void>
 }
 
-export function ListeningExerciseForm({ languages = [], levels = [], onSubmit }: ListeningExerciseFormProps) {
+export function ListeningExerciseForm({ modules = [], languages = [], levels = [], onSubmit }: ListeningExerciseFormProps) {
   const { toast } = useToast()
   const [questions, setQuestions] = useState<Question[]>([])
 
@@ -51,6 +55,7 @@ export function ListeningExerciseForm({ languages = [], levels = [], onSubmit }:
       content: '',
       languageId: '',
       levelId: '',
+      moduleId: '',
       questions: []
     }
   })
@@ -68,8 +73,7 @@ export function ListeningExerciseForm({ languages = [], levels = [], onSubmit }:
     try {
       const formData = {
         ...data,
-        questions,
-        moduleId: 'listening'
+        questions
       }
       await onSubmit(formData)
       toast({
@@ -115,6 +119,25 @@ export function ListeningExerciseForm({ languages = [], levels = [], onSubmit }:
             />
             {errors.content && (
               <p className="text-sm text-red-500">{errors.content.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="moduleId">Módulo</Label>
+            <select
+              id="moduleId"
+              {...register('moduleId')}
+              className="w-full p-2 border rounded"
+            >
+              <option value="">Selecione um módulo</option>
+              {modules.map((module) => (
+                <option key={module.id} value={module.id}>
+                  {module.name}
+                </option>
+              ))}
+            </select>
+            {errors.moduleId && (
+              <p className="text-sm text-red-500">{errors.moduleId.message}</p>
             )}
           </div>
 

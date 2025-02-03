@@ -34,15 +34,18 @@ const LANGUAGES = [
 const LEVELS = [
   {
     id: 'beginner',
-    name: 'Iniciante'
+    name: 'Iniciante',
+    code: 'BEG'
   },
   {
     id: 'intermediate',
-    name: 'Intermediário'
+    name: 'Intermediário',
+    code: 'INT'
   },
   {
     id: 'advanced',
-    name: 'Avançado'
+    name: 'Avançado',
+    code: 'ADV'
   }
 ]
 
@@ -100,11 +103,13 @@ async function main() {
       const createdLevel = await prisma.level.upsert({
         where: { id: level.id },
         update: {
-          name: level.name
+          name: level.name,
+          code: level.code
         },
         create: {
           id: level.id,
-          name: level.name
+          name: level.name,
+          code: level.code
         }
       })
       console.log('Created level:', createdLevel)

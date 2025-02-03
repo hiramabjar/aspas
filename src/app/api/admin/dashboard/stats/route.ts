@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { Language, Level, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import prisma from '@/lib/database/prisma'
 import { authOptions } from '@/lib/auth/auth-options'
 
-interface ExerciseGroupByLanguage {
-  languageId: string
-  _count: {
-    id: number
-  }
+type Language = {
+  id: string
+  name: string
 }
 
-interface ExerciseGroupByLevel {
-  levelId: string
+type Level = {
+  id: string
+  name: string
+}
+
+type ExerciseGroupByOutput = Prisma.ExerciseGroupByOutputType & {
   _count: {
     id: number
   }
@@ -47,7 +49,7 @@ export async function GET() {
       _count: {
         id: true
       }
-    }) as ExerciseGroupByLanguage[]
+    })
 
     // Buscar nomes dos idiomas
     const languages = await prisma.language.findMany()
@@ -61,7 +63,7 @@ export async function GET() {
       _count: {
         id: true
       }
-    }) as ExerciseGroupByLevel[]
+    })
 
     // Buscar nomes dos níveis
     const levels = await prisma.level.findMany()
@@ -73,14 +75,14 @@ export async function GET() {
       totalStudents,
       totalExercises,
       totalCompletedExercises,
-      exercisesByLanguage: exercisesByLanguage.map((item: ExerciseGroupByLanguage) => ({
+      exercisesByLanguage: exercisesByLanguage.map((item) => ({
         languageId: item.languageId,
-        languageName: languageMap.get(item.languageId) || item.languageId,
+        languageName: item.languageId ? languageMap.get(item.languageId) || item.languageId : '',
         count: item._count.id
       })),
-      exercisesByLevel: exercisesByLevel.map((item: ExerciseGroupByLevel) => ({
+      exercisesByLevel: exercisesByLevel.map((item) => ({
         levelId: item.levelId,
-        levelName: levelMap.get(item.levelId) || item.levelId,
+        levelName: item.levelId ? levelMap.get(item.levelId) || item.levelId : '',
         count: item._count.id
       }))
     })

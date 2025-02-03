@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ListeningExerciseForm } from '@/components/exercises/ListeningExerciseForm'
+import { ListeningExerciseForm, type ListeningExerciseFormData } from '@/components/exercises/ListeningExerciseForm'
 import { useToast } from '@/components/ui/use-toast'
 import { useQuery } from '@tanstack/react-query'
 
@@ -15,20 +15,15 @@ interface Level {
   name: string
 }
 
+interface Module {
+  id: string
+  name: string
+}
+
 interface Question {
   question: string
   options: string[]
   correctAnswer: string
-}
-
-interface ListeningExerciseData {
-  title: string
-  description: string
-  content: string
-  moduleId: string
-  languageId: string
-  levelId: string
-  questions: Question[]
 }
 
 export default function CreateListeningExercisePage() {
@@ -53,7 +48,16 @@ export default function CreateListeningExercisePage() {
     }
   })
 
-  const handleSubmit = async (data: ListeningExerciseData) => {
+  const { data: modules = [], isLoading: isLoadingModules } = useQuery<Module[]>({
+    queryKey: ['modules'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/modules')
+      if (!response.ok) throw new Error('Failed to fetch modules')
+      return response.json()
+    }
+  })
+
+  const handleSubmit = async (data: ListeningExerciseFormData) => {
     try {
       const response = await fetch('/api/exercises/listening', {
         method: 'POST',
@@ -82,7 +86,7 @@ export default function CreateListeningExercisePage() {
     }
   }
 
-  if (isLoadingLanguages || isLoadingLevels) {
+  if (isLoadingLanguages || isLoadingLevels || isLoadingModules) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -95,6 +99,7 @@ export default function CreateListeningExercisePage() {
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Criar Exercício de Listening</h1>
       <ListeningExerciseForm
+        modules={modules}
         languages={languages}
         levels={levels}
         onSubmit={handleSubmit}
