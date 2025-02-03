@@ -9,6 +9,18 @@ const nextConfig = {
   images: {
     domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
+  // Disable static generation for dynamic routes
+  staticPageGenerationTimeout: 1000,
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
+  // Configure which routes should not be static
+  unstable_excludeFiles: [
+    '**/api/**/*',
+    '**/admin/**/*',
+    '**/dashboard/**/*',
+    '**/student/**/*'
+  ],
   async headers() {
     return [
       {
