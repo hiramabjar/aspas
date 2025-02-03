@@ -1,35 +1,15 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-  return new PrismaClient({
-    log: ['query'],
-    // Configurações de cache do SQLite
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
-    },
-  }).$extends({
-    query: {
-      exercise: {
-        async findUnique({ args, query }) {
-          // Cache para consultas de áudio
-          if (args.select?.audioData) {
-            args.cacheStrategy = 'cache-first'
-          }
-          return query(args)
-        },
-      },
-    },
-  })
+  return new PrismaClient()
 }
 
-declare global {
-  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClientSingleton | undefined
 }
 
-const prisma = globalThis.prisma ?? prismaClientSingleton()
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
-if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma
-
-export default prisma 
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma 

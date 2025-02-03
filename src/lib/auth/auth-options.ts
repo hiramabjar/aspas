@@ -1,11 +1,9 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import prisma from '@/lib/database/prisma'
 import { compare } from 'bcryptjs'
+import { prisma } from '@/lib/database/prisma'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -15,27 +13,36 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Credenciais inválidas')
+          return null
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+          where: {
+            email: credentials.email
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            password: true
+          }
         })
 
         if (!user || !user.password) {
-          throw new Error('Credenciais inválidas')
+          return null
         }
 
         const isValid = await compare(credentials.password, user.password)
 
         if (!isValid) {
-          throw new Error('Credenciais inválidas')
+          return null
         }
 
         return {
           id: user.id,
-          email: user.email,
-          name: user.name,
+          email: user.email || "",
+          name: user.name || "",
           role: user.role
         }
       }
@@ -44,17 +51,21 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.role = user.role
+        return {
+          ...token,
+          role: user.role
+        }
       }
       return token
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          role: token.role
+        }
       }
-      return session
     }
   },
   pages: {
