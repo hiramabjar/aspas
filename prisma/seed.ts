@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { hash } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -54,32 +54,37 @@ async function main() {
     console.log('Starting seed...')
 
     // Criar usuário admin
-    const adminPassword = await hash('admin123', 12)
-    await prisma.user.upsert({
-      where: { email: 'admin@example.com' },
+    const adminPassword = await bcrypt.hash('admin123', 12)
+    const admin = await prisma.user.upsert({
+      where: { email: 'admin@aspas.com' },
       update: {},
       create: {
-        id: '1', // ID fixo para admin
-        email: 'admin@example.com',
-        name: 'Admin User',
+        email: 'admin@aspas.com',
+        name: 'Administrador',
         password: adminPassword,
-        role: 'admin'
-      }
+        role: 'ADMIN'
+      },
     })
 
     // Criar usuário estudante
-    const studentPassword = await hash('student123', 12)
-    await prisma.user.upsert({
-      where: { email: 'student@example.com' },
+    const studentPassword = await bcrypt.hash('student123', 12)
+    const student = await prisma.user.upsert({
+      where: { email: 'student@aspas.com' },
       update: {},
       create: {
-        id: '2', // ID fixo para estudante
-        email: 'student@example.com',
-        name: 'Student User',
+        email: 'student@aspas.com',
+        name: 'Estudante',
         password: studentPassword,
-        role: 'student'
-      }
+        role: 'STUDENT',
+        studentProfile: {
+          create: {
+            level: 'BEGINNER'
+          }
+        }
+      },
     })
+
+    console.log({ admin, student })
 
     // Criar idiomas
     for (const language of LANGUAGES) {
@@ -158,10 +163,11 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
+  .then(async () => {
     await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
   }) 
