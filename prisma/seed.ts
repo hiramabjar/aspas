@@ -53,6 +53,38 @@ async function main() {
   try {
     console.log('Starting seed...')
 
+    // Criar níveis primeiro
+    for (const level of LEVELS) {
+      await prisma.level.upsert({
+        where: { id: level.id },
+        update: {
+          name: level.name,
+          code: level.code
+        },
+        create: {
+          id: level.id,
+          name: level.name,
+          code: level.code
+        }
+      })
+    }
+
+    // Criar idiomas
+    for (const language of LANGUAGES) {
+      await prisma.language.upsert({
+        where: { id: language.id },
+        update: {
+          name: language.name,
+          code: language.code
+        },
+        create: {
+          id: language.id,
+          name: language.name,
+          code: language.code
+        }
+      })
+    }
+
     // Criar usuário admin
     const adminPassword = await bcrypt.hash('admin123', 12)
     const admin = await prisma.user.upsert({
@@ -78,47 +110,16 @@ async function main() {
         role: 'STUDENT',
         studentProfile: {
           create: {
-            level: 'BEGINNER'
+            enrollments: {
+              create: {
+                languageId: 'en',
+                levelId: 'beginner'
+              }
+            }
           }
         }
       },
     })
-
-    console.log({ admin, student })
-
-    // Criar idiomas
-    for (const language of LANGUAGES) {
-      const createdLanguage = await prisma.language.upsert({
-        where: { id: language.id },
-        update: {
-          name: language.name,
-          code: language.code
-        },
-        create: {
-          id: language.id,
-          name: language.name,
-          code: language.code
-        }
-      })
-      console.log('Created language:', createdLanguage)
-    }
-
-    // Criar níveis
-    for (const level of LEVELS) {
-      const createdLevel = await prisma.level.upsert({
-        where: { id: level.id },
-        update: {
-          name: level.name,
-          code: level.code
-        },
-        create: {
-          id: level.id,
-          name: level.name,
-          code: level.code
-        }
-      })
-      console.log('Created level:', createdLevel)
-    }
 
     // Criar módulos
     const readingModule = await prisma.module.upsert({
@@ -150,6 +151,8 @@ async function main() {
     })
 
     console.log('Seed completed successfully:', {
+      admin,
+      student,
       languages: await prisma.language.findMany(),
       levels: await prisma.level.findMany(),
       modules: await prisma.module.findMany()
