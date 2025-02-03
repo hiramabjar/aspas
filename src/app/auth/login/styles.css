@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animações */
+@keyframes pulse-slow {
+  0% {
+    opacity: 0.4;
+    transform: scale(1.02) translateY(2px);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(1.02) translateY(2px);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Variáveis de cores */
+:root {
+  --login-bg: #2D2438;
+  --login-card: #4A3B5C;
+  --login-border: #8B6C9C;
+  --login-highlight: #D7C5DF;
+  --login-text: #E5D5F2;
+}
+
+@layer components {
+  /* Estilos específicos da página de login */
+  .login-page {
+    @apply min-h-screen w-full flex items-center justify-center relative overflow-hidden;
+  }
+
+  .login-background {
+    @apply absolute inset-0;
+  }
+
+  .login-overlay {
+    @apply absolute inset-0 backdrop-blur-[2px];
+    background-color: rgba(45, 36, 56, 0.7);
+  }
+
+  .login-container {
+    @apply relative z-10 flex flex-col items-center w-full max-w-md mx-auto px-4;
+  }
+
+  .login-logo-container {
+    @apply relative w-64 h-24 mb-8;
+  }
+
+  .login-card {
+    @apply w-full p-8 border shadow-xl backdrop-blur-sm;
+    background-color: rgba(74, 59, 92, 0.95);
+    border-color: var(--login-border);
+  }
+
+  .login-input {
+    @apply border text-white;
+    background-color: rgba(45, 36, 56, 0.5);
+    border-color: var(--login-border);
+  }
+
+  .login-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .login-input:focus {
+    border-color: var(--login-highlight);
+    box-shadow: 0 0 0 2px var(--login-highlight);
+  }
+
+  .login-button {
+    @apply w-full py-6 text-lg text-white font-bold transition-all duration-300;
+    background-color: var(--login-border);
+  }
+
+  .login-button:hover {
+    @apply shadow-lg scale-[1.02];
+    background-color: var(--login-highlight);
+  }
+
+  .login-link {
+    @apply transition-colors hover:underline;
+    color: var(--login-text);
+  }
+
+  .login-link:hover {
+    color: white;
+  }
+} 

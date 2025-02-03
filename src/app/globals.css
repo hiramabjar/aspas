@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #8B6C9C;
+  --primary-dark: #4A3B5C;
+  --primary-light: #D7C5DF;
+  --accent: #B794C0;
+  --accent-dark: #895896;
+  --background: #2D2438;
+  --background-light: #4D3B64;
+  --text: #E5D5F2;
+  --text-secondary: #B794C0;
+  --text-muted: rgba(229, 213, 242, 0.7);
+  --border: #563763;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--background)];
+  }
+}
+
+/* Adicione isso ao seu arquivo de estilos */
+audio {
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  width: 100%;
+  height: 40px;
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: #f3f4f6;
+}
+
+audio::-webkit-media-controls-play-button {
+  background-color: #3b82f6;
+  border-radius: 50%;
+}
+
+audio::-webkit-media-controls-play-button:hover {
+  background-color: #2563eb;
+}
+
+/* Estilos personalizados para o player de áudio */
+.custom-audio-player {
+  @apply bg-[var(--primary-dark)] rounded-xl shadow-lg;
+  height: 44px;
+}
+
+.custom-audio-player::-webkit-media-controls-panel {
+  @apply bg-[var(--primary-dark)] rounded-xl;
+}
+
+.custom-audio-player::-webkit-media-controls-play-button {
+  @apply bg-[var(--accent)] rounded-full text-[var(--text)];
+}
+
+.custom-audio-player::-webkit-media-controls-play-button:hover {
+  @apply bg-[var(--accent-dark)];
+}
+
+.custom-audio-player::-webkit-media-controls-current-time-display,
+.custom-audio-player::-webkit-media-controls-time-remaining-display {
+  @apply text-[var(--text)] font-mono;
+}
+
+.custom-audio-player::-webkit-media-controls-volume-slider {
+  @apply bg-[var(--accent)] rounded-lg;
+  padding: 0 0.5rem;
+}
+
+.custom-audio-player::-webkit-media-controls-progress-bar {
+  @apply bg-[var(--accent)] rounded-lg;
+}
+
+.custom-audio-player::-webkit-media-controls-timeline {
+  @apply text-[var(--accent)];
+}
+
+/* Estilos para cards e elementos de UI */
+.card-white {
+  @apply bg-white shadow-lg rounded-xl;
+}
+
+.button-primary {
+  @apply bg-[#4285f4] hover:bg-[#3367d6] text-white transition-all duration-200;
+}
+
+.button-accent {
+  @apply bg-[var(--accent-100)] hover:bg-[var(--accent-200)] text-[var(--text-100)] transition-colors duration-200;
+}
+
+.input-field {
+  @apply bg-white border border-gray-200 text-[var(--bg-300)] focus:ring-[var(--primary-300)] focus:border-[var(--primary-300)];
+}
+
+/* Animações */
+@keyframes pulse-slow {
+  0% {
+    opacity: 0.4;
+    transform: scale(1.02) translateY(2px);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(1.02) translateY(2px);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@layer components {
+  .dashboard-card {
+    @apply bg-[var(--primary-dark)] border-none shadow-lg rounded-xl 
+    hover:shadow-xl transition-all duration-300;
+  }
+
+  .dashboard-stat {
+    @apply p-6 bg-[var(--primary-dark)] border-none shadow-lg rounded-xl
+    hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm bg-opacity-95;
+  }
+
+  .dashboard-icon-container {
+    @apply p-3 rounded-xl bg-[var(--background)] bg-opacity-50;
+  }
+
+  .dashboard-icon {
+    @apply w-6 h-6 text-[var(--text)];
+  }
+
+  .dashboard-title {
+    @apply text-3xl font-bold text-[var(--text)] mb-8;
+  }
+
+  .dashboard-subtitle {
+    @apply text-[var(--text-muted)];
+  }
+
+  .dashboard-link {
+    @apply text-[var(--text-secondary)] hover:text-[var(--text)] 
+    transition-colors duration-200 hover:underline;
+  }
+
+  .dashboard-button {
+    @apply bg-[var(--primary)] hover:bg-[var(--accent)] text-[var(--text)] 
+    transition-all duration-300 font-medium px-4 py-2 rounded-xl
+    hover:shadow-lg hover:scale-[1.02] border-none;
+  }
+
+  .dashboard-table {
+    @apply w-full border-collapse;
+  }
+
+  .dashboard-table th {
+    @apply px-4 py-2 text-left text-[var(--text-secondary)] font-medium;
+  }
+
+  .dashboard-table td {
+    @apply px-4 py-2 text-[var(--text)];
+  }
+
+  .dashboard-table tr {
+    @apply border-b border-[var(--border)];
+  }
+
+  .dashboard-input {
+    @apply bg-[var(--background)] border-[var(--border)] text-[var(--text)]
+    focus:border-[var(--primary-light)] focus:ring-[var(--primary-light)]
+    placeholder:text-[var(--text-muted)] rounded-xl;
+  }
+} 
