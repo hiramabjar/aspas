@@ -7,7 +7,11 @@ const nextConfig = {
       allowedOrigins: ['localhost:3000', 'render.com']
     }
   },
-  webpack: (config) => {
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': './src'
+    };
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
