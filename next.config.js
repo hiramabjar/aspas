@@ -1,20 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  output: 'standalone',
   experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000', 'render.com']
-    }
-  },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': './src'
-    };
-    return config;
+    serverActions: true,
   },
   images: {
-    domains: ['hebbkx1anhila5yf.public.blob.vercel-storage.com'],
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
 }
 
