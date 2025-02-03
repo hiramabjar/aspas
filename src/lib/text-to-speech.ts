@@ -1,4 +1,6 @@
-const LANGUAGE_VOICES = {
+type LanguageCode = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt'
+
+const LANGUAGE_VOICES: Record<LanguageCode, string> = {
   'en': 'en-US',
   'es': 'es-ES',
   'fr': 'fr-FR',
@@ -10,7 +12,7 @@ const LANGUAGE_VOICES = {
 export async function textToSpeech(text: string, language: string = 'en'): Promise<Buffer> {
   try {
     // Normalizar o código do idioma
-    const langCode = language.toLowerCase().split('-')[0]
+    const langCode = language.toLowerCase().split('-')[0] as LanguageCode
     const voiceLocale = LANGUAGE_VOICES[langCode] || 'en-US'
 
     // Dividir o texto em partes menores

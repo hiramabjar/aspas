@@ -65,6 +65,11 @@ export function StatsOverview() {
     return value.toString()
   }
 
+  const getChangeColor = (change: number | undefined) => {
+    if (change === undefined) return 'text-gray-600'
+    return change >= 0 ? 'text-green-600' : 'text-red-600'
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <Card className="p-6">
@@ -74,9 +79,9 @@ export function StatsOverview() {
           </div>
           <div>
             <h3 className="text-sm font-medium text-gray-600">Alunos Ativos</h3>
-            <p className="text-2xl font-bold">{stats?.activeStudents.current || 0}</p>
-            <p className={`text-sm ${stats?.activeStudents.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatChange(stats?.activeStudents.change || 0)} vs. mês anterior
+            <p className="text-2xl font-bold">{stats?.activeStudents?.current ?? 0}</p>
+            <p className={`text-sm ${getChangeColor(stats?.activeStudents?.change)}`}>
+              {formatChange(Number(stats?.activeStudents?.change ?? 0))} vs. mês anterior
             </p>
           </div>
         </div>
@@ -89,9 +94,9 @@ export function StatsOverview() {
           </div>
           <div>
             <h3 className="text-sm font-medium text-gray-600">Total de Exercícios</h3>
-            <p className="text-2xl font-bold">{stats?.totalExercises.current || 0}</p>
-            <p className={`text-sm ${stats?.totalExercises.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatChange(stats?.totalExercises.change || 0)} vs. mês anterior
+            <p className="text-2xl font-bold">{stats?.totalExercises?.current ?? 0}</p>
+            <p className={`text-sm ${getChangeColor(stats?.totalExercises?.change)}`}>
+              {formatChange(Number(stats?.totalExercises?.change ?? 0))} vs. mês anterior
             </p>
           </div>
         </div>
@@ -104,9 +109,9 @@ export function StatsOverview() {
           </div>
           <div>
             <h3 className="text-sm font-medium text-gray-600">Taxa de Conclusão</h3>
-            <p className="text-2xl font-bold">{(stats?.completionRate.current || 0).toFixed(1)}%</p>
-            <p className={`text-sm ${stats?.completionRate.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatChange((stats?.completionRate.change || 0).toFixed(1))}% vs. mês anterior
+            <p className="text-2xl font-bold">{(stats?.completionRate?.current ?? 0).toFixed(1)}%</p>
+            <p className={`text-sm ${getChangeColor(stats?.completionRate?.change)}`}>
+              {formatChange(Number((stats?.completionRate?.change ?? 0).toFixed(1)))}% vs. mês anterior
             </p>
           </div>
         </div>
@@ -119,9 +124,9 @@ export function StatsOverview() {
           </div>
           <div>
             <h3 className="text-sm font-medium text-gray-600">Tempo Médio</h3>
-            <p className="text-2xl font-bold">{stats?.averageTime.current || 0}min</p>
-            <p className={`text-sm ${stats?.averageTime.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatChange(stats?.averageTime.change || 0)}min vs. mês anterior
+            <p className="text-2xl font-bold">{stats?.averageTime?.current ?? 0}min</p>
+            <p className={`text-sm ${getChangeColor(stats?.averageTime?.change)}`}>
+              {formatChange(Number(stats?.averageTime?.change ?? 0))}min vs. mês anterior
             </p>
           </div>
         </div>

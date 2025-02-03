@@ -126,6 +126,8 @@ model Exercise {
   description String
   content     String
   type        String // reading, listening, dictation
+  audioUrl    String?           // URL do arquivo de áudio
+  voiceId     String?           // ID da voz usada para gerar o áudio
   languageId  String
   levelId     String
   moduleId    String?
@@ -168,23 +170,29 @@ model ExerciseProgress {
   exerciseId String
   status     String    @default("NOT_STARTED")
   score      Float?
+  attempts   Int       @default(0)
+  answers    String?   // JSON string of answers
   startedAt  DateTime  @default(now())
   finishedAt DateTime?
   user       User      @relation(fields: [userId], references: [id])
   exercise   Exercise  @relation("ExerciseToProgress", fields: [exerciseId], references: [id])
 
+  @@unique([userId, exerciseId])
   @@index([userId])
   @@index([exerciseId])
 }
 
 model ModuleProgress {
-  id       String @id @default(cuid())
-  userId   String
-  moduleId String
-  progress Float  @default(0)
-  user     User   @relation(fields: [userId], references: [id])
-  module   Module @relation("ModuleToModuleProgress", fields: [moduleId], references: [id])
+  id        String @id @default(cuid())
+  userId    String
+  moduleId  String
+  progress  Float  @default(0)
+  completed Int    @default(0)  // Number of completed exercises
+  total     Int    @default(0)  // Total number of attempts
+  user      User   @relation(fields: [userId], references: [id])
+  module    Module @relation("ModuleToModuleProgress", fields: [moduleId], references: [id])
 
+  @@unique([userId, moduleId])
   @@index([userId])
   @@index([moduleId])
 }

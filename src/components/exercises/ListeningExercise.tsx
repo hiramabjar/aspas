@@ -12,14 +12,34 @@ import { Slider } from '@/components/ui/slider'
 import { DownloadPdfButton } from './DownloadPdfButton'
 import type { Exercise } from '@/types/exercise'
 
-interface ListeningExerciseProps {
-  exercise: Exercise
-  onSubmit: (answers: Array<{ questionId: string; answer: string }>) => void
+interface Question {
+  id: string
+  question: string
+  options: string[]
+  correctAnswer: string
 }
 
-export function ListeningExercise({ exercise, onSubmit }: ListeningExerciseProps) {
+interface ListeningExerciseProps {
+  id: string
+  title: string
+  description: string
+  content: string
+  audioUrl?: string
+  questions: Question[]
+  onComplete: (score: number, answers: Record<string, string>) => Promise<void>
+}
+
+export function ListeningExercise({ 
+  id,
+  title,
+  description,
+  content,
+  audioUrl,
+  questions,
+  onComplete 
+}: ListeningExerciseProps) {
   const { toast } = useToast()
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>(Array(exercise.questions.length).fill(''))
+  const [selectedAnswers, setSelectedAnswers] = useState<string[]>(Array(questions.length).fill(''))
   const [showResults, setShowResults] = useState(false)
   const [playbackRate, setPlaybackRate] = useState(1)
   const [volume, setVolume] = useState(1)
@@ -28,10 +48,10 @@ export function ListeningExercise({ exercise, onSubmit }: ListeningExerciseProps
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   useEffect(() => {
-    if (!exercise.audioUrl) {
+    if (!audioUrl) {
       // Configurar a síntese de voz como fallback
-      utteranceRef.current = new SpeechSynthesisUtterance(exercise.content)
-      utteranceRef.current.lang = exercise.language.code
+      utteranceRef.current = new SpeechSynthesisUtterance(content)
+      utteranceRef.current.lang = 'pt-BR'
       utteranceRef.current.rate = playbackRate
       utteranceRef.current.volume = volume
       
@@ -41,7 +61,7 @@ export function ListeningExercise({ exercise, onSubmit }: ListeningExerciseProps
         }
       }
     }
-  }, [exercise.content, exercise.language.code, exercise.audioUrl, playbackRate, volume])
+  }, [content, playbackRate, volume])
 
   const playAudio = () => {
     if (!utteranceRef.current) return
@@ -92,15 +112,20 @@ export function ListeningExercise({ exercise, onSubmit }: ListeningExerciseProps
       return
     }
 
-    // Criar array de respostas no formato esperado
-    const formattedAnswers = exercise.questions.map((question, index) => ({
-      questionId: question.id,
-      answer: selectedAnswers[index]
-    }))
+    // Calcular pontuação
+    const correctAnswers = questions.reduce((count, question, index) => {
+      return count + (selectedAnswers[index] === question.correctAnswer ? 1 : 0)
+    }, 0)
+    const score = (correctAnswers / questions.length) * 100
 
-    // Enviar respostas para pontuação
+    // Criar objeto de respostas
+    const answers = questions.reduce((acc, question, index) => {
+      return { ...acc, [question.id]: selectedAnswers[index] }
+    }, {} as Record<string, string>)
+
+    // Enviar respostas e pontuação
     try {
-      onSubmit(formattedAnswers)
+      onComplete(score, answers)
       setShowResults(true)
       toast({
         title: "Sucesso",
@@ -126,20 +151,20 @@ export function ListeningExercise({ exercise, onSubmit }: ListeningExerciseProps
             </div>
             <div>
               <h2 className="text-xl font-bold text-white mb-1">Exercício de Listening</h2>
-              <p className="text-[#B794C0]">{exercise.description}</p>
+              <p className="text-[#B794C0]">{description}</p>
             </div>
           </div>
           <DownloadPdfButton
-            title={exercise.title}
-            content={exercise.content}
-            description={exercise.description}
+            title={title}
+            content={content}
+            description={description}
           />
         </div>
 
         <div className="bg-[#2D2440] border border-[#4A3B5C] rounded-xl p-6">
-          {exercise.audioUrl ? (
+          {audioUrl ? (
             <AudioPlayer 
-              audioUrl={exercise.audioUrl}
+              audioUrl={audioUrl}
               onPlaybackRateChange={handlePlaybackRateChange}
               onVolumeChange={handleVolumeChange}
               className="bg-[#382D4B] border border-[#4A3B5C] shadow-lg"
@@ -210,57 +235,54 @@ export function ListeningExercise({ exercise, onSubmit }: ListeningExerciseProps
       </Card>
 
       <div className="space-y-4">
-        {exercise.questions.map((question, index) => {
-          const options = JSON.parse(question.options)
-          return (
-            <Card key={question.id} className="bg-[#382D4B] border-[#4A3B5C] p-6 shadow-lg">
-              <p className="font-semibold text-white mb-4 text-lg">
-                {index + 1}. {question.question}
-              </p>
-              <RadioGroup
-                value={selectedAnswers[index]}
-                onValueChange={(value: string) => {
-                  const newAnswers = [...selectedAnswers]
-                  newAnswers[index] = value
-                  setSelectedAnswers(newAnswers)
-                }}
-                className="space-y-2"
-              >
-                {options.map((option: string, optIndex: number) => (
-                  <div
-                    key={optIndex}
-                    className="flex items-center space-x-3 p-3 rounded-lg bg-[#2D2440] border border-[#4A3B5C] hover:border-[#6D5A88] transition-all duration-200"
+        {questions.map((question: Question, index: number) => (
+          <Card key={question.id} className="bg-[#382D4B] border-[#4A3B5C] p-6 shadow-lg">
+            <p className="font-semibold text-white mb-4 text-lg">
+              {index + 1}. {question.question}
+            </p>
+            <RadioGroup
+              value={selectedAnswers[index]}
+              onValueChange={(value: string) => {
+                const newAnswers = [...selectedAnswers]
+                newAnswers[index] = value
+                setSelectedAnswers(newAnswers)
+              }}
+              className="space-y-2"
+            >
+              {question.options.map((option: string, optIndex: number) => (
+                <div
+                  key={optIndex}
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-[#2D2440] border border-[#4A3B5C] hover:border-[#6D5A88] transition-all duration-200"
+                >
+                  <RadioGroupItem
+                    value={option}
+                    id={`q${index}-opt${optIndex}`}
+                    className="border-[#6D5A88] text-white"
+                  />
+                  <Label
+                    htmlFor={`q${index}-opt${optIndex}`}
+                    className="text-white cursor-pointer flex-1"
                   >
-                    <RadioGroupItem
-                      value={option}
-                      id={`q${index}-opt${optIndex}`}
-                      className="border-[#6D5A88] text-white"
-                    />
-                    <Label
-                      htmlFor={`q${index}-opt${optIndex}`}
-                      className="text-white cursor-pointer flex-1"
-                    >
-                      {option}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-              {showResults && (
-                <div className="mt-4 p-3 rounded-lg border bg-[#2D2440] border-[#4A3B5C]">
-                  <p className={`text-sm ${
-                    selectedAnswers[index] === question.correctAnswer
-                      ? 'text-emerald-400'
-                      : 'text-red-400'
-                  }`}>
-                    {selectedAnswers[index] === question.correctAnswer
-                      ? '✓ Resposta correta!'
-                      : `✗ Resposta incorreta. A resposta correta é: ${question.correctAnswer}`}
-                  </p>
+                    {option}
+                  </Label>
                 </div>
-              )}
-            </Card>
-          )
-        })}
+              ))}
+            </RadioGroup>
+            {showResults && (
+              <div className="mt-4 p-3 rounded-lg border bg-[#2D2440] border-[#4A3B5C]">
+                <p className={`text-sm ${
+                  selectedAnswers[index] === question.correctAnswer
+                    ? 'text-green-400'
+                    : 'text-red-400'
+                }`}>
+                  {selectedAnswers[index] === question.correctAnswer
+                    ? 'Correto!'
+                    : `Incorreto. A resposta correta era: ${question.correctAnswer}`}
+                </p>
+              </div>
+            )}
+          </Card>
+        ))}
       </div>
 
       {!showResults && (

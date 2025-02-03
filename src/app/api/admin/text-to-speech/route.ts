@@ -39,15 +39,14 @@ export async function POST(request: Request) {
     }
 
     try {
-      // Converter o Blob para ArrayBuffer
-      const audioBuffer = await audioFile.arrayBuffer()
-      const audioData = new Uint8Array(audioBuffer)
+      // Gerar URL do áudio
+      const audioUrl = `/api/exercises/${exerciseId}/audio`
 
-      // Atualizar o exercício com o áudio
+      // Atualizar o exercício com a URL do áudio
       await prisma.exercise.update({
         where: { id: exerciseId },
         data: { 
-          audioData,
+          audioUrl,
           voiceId: 'system'
         }
       })
@@ -55,7 +54,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         message: 'Áudio salvo com sucesso',
-        audioUrl: `/api/exercises/${exerciseId}/audio`
+        audioUrl
       })
 
     } catch (dbError) {

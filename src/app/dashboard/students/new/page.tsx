@@ -5,11 +5,18 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 
+interface StudentFormData {
+  name: string
+  email: string
+  password: string
+  level: 'basic' | 'intermediate' | 'advanced'
+}
+
 export default function NewStudentPage() {
   const router = useRouter()
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit } = useForm<StudentFormData>()
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: StudentFormData) => {
     try {
       // Implementar criação do aluno
       console.log(data)

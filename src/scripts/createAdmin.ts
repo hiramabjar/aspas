@@ -6,6 +6,30 @@ const prisma = new PrismaClient()
 
 async function main() {
   try {
+    // Criar idioma e nível primeiro
+    const language = await prisma.language.create({
+      data: {
+        name: 'English',
+        code: 'en'
+      }
+    })
+
+    const level = await prisma.level.create({
+      data: {
+        name: 'Beginner',
+        code: 'A1'
+      }
+    })
+
+    // Criar módulo
+    const module = await prisma.module.create({
+      data: {
+        name: 'Introduction',
+        description: 'Introduction to English',
+        order: 1
+      }
+    })
+
     // Leitura do arquivo de áudio
     const audioPath = path.join(process.cwd(), 'path/to/your/audio/files', 'audio.mp3')
     const audioData = fs.readFileSync(audioPath)
@@ -15,11 +39,12 @@ async function main() {
       data: {
         title: 'Título do Exercício',
         description: 'Descrição do Exercício',
-        type: 'LISTENING', // ou outro tipo apropriado
-        level: 'BEGINNER', // ou outro nível apropriado
-        moduleId: 'ID_DO_MODULO', // substitua pelo ID correto
-        audioData: audioData, // Incluindo os dados do áudio
-        // ... outros campos necessários
+        content: 'Conteúdo do exercício',
+        type: 'listening',
+        languageId: language.id,
+        levelId: level.id,
+        moduleId: module.id,
+        audioUrl: 'path/to/audio.mp3'
       },
     })
 

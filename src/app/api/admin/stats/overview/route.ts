@@ -105,11 +105,22 @@ export async function GET() {
     // Tempo médio de conclusão
     const attempts = await prisma.exerciseAttempt.findMany({
       where: {
-        completedAt: {
-          gte: firstDayOfMonth,
-          lte: lastDayOfMonth
-        },
-        completed: true
+        AND: [
+          {
+            completedAt: {
+              gte: firstDayOfMonth,
+              lte: lastDayOfMonth
+            }
+          },
+          {
+            completed: true
+          },
+          {
+            startedAt: {
+              not: undefined
+            }
+          }
+        ]
       },
       select: {
         startedAt: true,
@@ -118,6 +129,7 @@ export async function GET() {
     })
 
     const totalTime = attempts.reduce((acc, attempt) => {
+      if (!attempt.completedAt || !attempt.startedAt) return acc
       const time = attempt.completedAt.getTime() - attempt.startedAt.getTime()
       return acc + time
     }, 0)

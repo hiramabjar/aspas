@@ -1,5 +1,5 @@
 import { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from '@auth/prisma-adapter'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import prisma from '@/lib/database/prisma'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
@@ -29,13 +29,13 @@ export const authOptions: NextAuthOptions = {
           }
         })
 
-        if (!user || !user?.hashedPassword) {
+        if (!user || !user?.password) {
           throw new Error('Credenciais inválidas')
         }
 
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
-          user.hashedPassword
+          user.password
         )
 
         if (!isCorrectPassword) {

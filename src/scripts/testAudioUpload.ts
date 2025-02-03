@@ -16,36 +16,39 @@ async function testAudioUpload() {
     }
 
     console.log('Lendo arquivo de áudio:', audioPath)
-    const audioData = fs.readFileSync(audioPath)
-    console.log('Tamanho do arquivo:', audioData.length, 'bytes')
+    
+    // Copiar o arquivo para a pasta public/audio se não existir
+    const publicAudioPath = path.join(process.cwd(), 'public', 'audio', 'test-audio.mp3')
+    if (!fs.existsSync(publicAudioPath)) {
+      fs.copyFileSync(audioPath, publicAudioPath)
+    }
 
-    // Atualizar exercício existente com áudio
+    // Atualizar exercício existente com a URL do áudio
     const updatedExercise = await prisma.exercise.update({
       where: {
         id: 'cm6k1u7qt00014yfcy1t5yqv4'
       },
       data: {
-        audioData: audioData
+        audioUrl: '/audio/test-audio.mp3'
       }
     })
 
-    console.log('Áudio atualizado com sucesso:', updatedExercise.id)
+    console.log('URL do áudio atualizada com sucesso:', updatedExercise.id)
 
-    // Verificar se o áudio foi salvo
+    // Verificar se a URL do áudio foi salva
     const checkExercise = await prisma.exercise.findUnique({
       where: {
         id: 'cm6k1u7qt00014yfcy1t5yqv4'
       },
       select: {
-        audioData: true
+        audioUrl: true
       }
     })
 
-    if (checkExercise?.audioData) {
-      console.log('Áudio encontrado no banco de dados')
-      console.log('Tamanho do áudio:', checkExercise.audioData.length, 'bytes')
+    if (checkExercise?.audioUrl) {
+      console.log('URL do áudio encontrada no banco de dados:', checkExercise.audioUrl)
     } else {
-      console.log('Áudio não encontrado no banco de dados')
+      console.log('URL do áudio não encontrada no banco de dados')
     }
 
   } catch (error) {

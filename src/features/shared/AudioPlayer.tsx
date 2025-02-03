@@ -1,6 +1,11 @@
 import { useState, useRef } from 'react'
+import { Button } from '@/components/ui/button'
 
-export function AudioPlayer({ url }) {
+interface AudioPlayerProps {
+  url: string
+}
+
+export function AudioPlayer({ url }: AudioPlayerProps) {
   const [playing, setPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 

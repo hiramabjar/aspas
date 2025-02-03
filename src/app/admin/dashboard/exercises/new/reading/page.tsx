@@ -9,7 +9,7 @@ import { LANGUAGES, LEVELS } from '@/lib/constants'
 import toast from 'react-hot-toast'
 import { BookOpen, Plus, Trash2, GripVertical } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Button, type ButtonProps } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useQueryClient } from '@tanstack/react-query'
 

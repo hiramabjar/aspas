@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { verifyPassword } from '@/lib/auth/password-utils'
+import { comparePassword } from '@/lib/auth/password-utils'
 import prisma from '@/lib/database/prisma'
 
 export const authOptions: NextAuthOptions = {
@@ -20,11 +20,11 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email }
         })
 
-        if (!user) {
+        if (!user || !user.password) {
           return null
         }
 
-        const isPasswordValid = await verifyPassword(credentials.password, user.password)
+        const isPasswordValid = await comparePassword(credentials.password, user.password)
 
         if (!isPasswordValid) {
           return null

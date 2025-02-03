@@ -3,6 +3,12 @@ import prisma from '@/lib/database/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/auth-options'
 
+interface QuestionData {
+  question: string
+  options: string[]
+  correctAnswer: string
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
@@ -104,7 +110,7 @@ export async function POST(request: Request) {
         languageId: data.languageId,
         levelId: data.levelId,
         questions: {
-          create: data.questions.map(q => ({
+          create: data.questions.map((q: QuestionData) => ({
             question: q.question,
             options: JSON.stringify(q.options),
             correctAnswer: q.correctAnswer

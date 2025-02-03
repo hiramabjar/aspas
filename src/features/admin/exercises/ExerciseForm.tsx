@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import type { Exercise } from '@/types/exercise'
 
 const exerciseSchema = z.object({
-  type: z.enum(['READING', 'GRAMMAR', 'LISTENING', 'DICTATION']),
-  language: z.enum(['EN', 'ES', 'DE', 'IT', 'FR']),
+  type: z.enum(['reading', 'listening', 'dictation']),
+  language: z.enum(['en', 'es', 'de', 'it', 'fr']),
   level: z.string(),
   content: z.string().min(10),
   questions: z.array(z.object({
@@ -27,43 +28,65 @@ type ExerciseFormProps = {
 export function ExerciseForm({ initialData, onSubmit }: ExerciseFormProps) {
   const form = useForm<z.infer<typeof exerciseSchema>>({
     resolver: zodResolver(exerciseSchema),
-    defaultValues: initialData || {
-      type: 'READING',
-      language: 'EN',
+    defaultValues: initialData ? {
+      type: initialData.type,
+      language: initialData.language.name.toLowerCase() as 'en' | 'es' | 'de' | 'it' | 'fr',
+      level: initialData.level.name,
+      content: initialData.content,
+      questions: initialData.questions.map(q => ({
+        question: q.question,
+        options: JSON.parse(q.options as string),
+        correctAnswer: q.correctAnswer
+      })),
+      audioUrl: initialData.audioUrl
+    } : {
+      type: 'reading',
+      language: 'en',
       level: 'A1',
       content: '',
       questions: []
     }
   })
 
+  const handleSelectChange = (field: keyof z.infer<typeof exerciseSchema>) => (value: string) => {
+    form.setValue(field, value as any)
+  }
+
+  const handleAudioUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    // Implementar lógica de upload de áudio
+  }
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Select onValueChange={form.setValue} defaultValue={form.watch('type')}>
+        <Select onValueChange={handleSelectChange('type')} defaultValue={form.watch('type')}>
           <SelectTrigger>
             <SelectValue placeholder="Tipo de Exercício" />
           </SelectTrigger>
           <SelectContent>
-            {['READING', 'GRAMMAR', 'LISTENING', 'DICTATION'].map(type => (
-              <SelectItem key={type} value={type}>{type}</SelectItem>
-            ))}
+            <SelectItem value="reading">Leitura</SelectItem>
+            <SelectItem value="listening">Listening</SelectItem>
+            <SelectItem value="dictation">Ditado</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select onValueChange={form.setValue} defaultValue={form.watch('language')}>
+        <Select onValueChange={handleSelectChange('language')} defaultValue={form.watch('language')}>
           <SelectTrigger>
             <SelectValue placeholder="Idioma" />
           </SelectTrigger>
           <SelectContent>
-            {['EN', 'ES', 'DE', 'IT', 'FR'].map(lang => (
-              <SelectItem key={lang} value={lang}>{lang}</SelectItem>
-            ))}
+            <SelectItem value="en">Inglês</SelectItem>
+            <SelectItem value="es">Espanhol</SelectItem>
+            <SelectItem value="de">Alemão</SelectItem>
+            <SelectItem value="it">Italiano</SelectItem>
+            <SelectItem value="fr">Francês</SelectItem>
           </SelectContent>
         </Select>
 
         <Input {...form.register('level')} placeholder="Nível (ex: A1, B2)" />
         
-        {form.watch('type') === 'DICTATION' && (
+        {form.watch('type') === 'dictation' && (
           <Input 
             type="file" 
             accept="audio/*"
@@ -78,21 +101,7 @@ export function ExerciseForm({ initialData, onSubmit }: ExerciseFormProps) {
         rows={6}
       />
 
-      {form.watch('type') === 'GRAMMAR' && (
-        <div className="space-y-4">
-          {form.watch('questions')?.map((_, index) => (
-            <div key={index} className="border p-4 rounded">
-              <Input {...form.register(`questions.${index}.question`)} />
-              {/* Campos para opções e resposta correta */}
-            </div>
-          ))}
-          <Button type="button" onClick={() => form.setValue('questions', [...form.watch('questions')!, { question: '', options: [], correctAnswer: '' }])}>
-            Adicionar Questão
-          </Button>
-        </div>
-      )}
-
-      <Button type="submit" className="w-full">
+      <Button type="submit">
         {initialData ? 'Atualizar' : 'Criar'} Exercício
       </Button>
     </form>

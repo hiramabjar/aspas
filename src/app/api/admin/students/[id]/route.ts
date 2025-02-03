@@ -56,23 +56,30 @@ export async function PUT(
         }
       })
 
-      // Atualizar matrículas
-      if (user.studentProfile) {
-        // Remover matrículas antigas
-        await tx.enrollment.deleteMany({
-          where: { studentProfileId: user.studentProfile.id }
-        })
-
-        // Criar novas matrículas
-        await tx.enrollment.createMany({
-          data: data.enrollments.map((enrollment: any) => ({
-            studentProfileId: user.studentProfile.id,
-            languageId: enrollment.languageId,
-            levelId: enrollment.levelId,
-            status: 'ACTIVE'
-          }))
+      // Garantir que existe um perfil de estudante
+      let studentProfile = user.studentProfile
+      if (!studentProfile) {
+        studentProfile = await tx.studentProfile.create({
+          data: {
+            userId: user.id
+          }
         })
       }
+
+      // Remover matrículas antigas
+      await tx.enrollment.deleteMany({
+        where: { studentProfileId: studentProfile.id }
+      })
+
+      // Criar novas matrículas
+      await tx.enrollment.createMany({
+        data: data.enrollments.map((enrollment: any) => ({
+          studentProfileId: studentProfile.id,
+          languageId: enrollment.languageId,
+          levelId: enrollment.levelId,
+          status: 'ACTIVE'
+        }))
+      })
 
       // Retornar usuário atualizado com todas as relações
       return tx.user.findUnique({

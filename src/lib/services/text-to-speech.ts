@@ -1,6 +1,6 @@
 export async function generateSpeech(utterance: SpeechSynthesisUtterance): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    const audioContext = new AudioContext()
     const mediaRecorder = new MediaRecorder(audioContext.createMediaStreamDestination().stream)
     const audioChunks: BlobPart[] = []
 

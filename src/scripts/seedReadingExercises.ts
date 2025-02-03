@@ -32,7 +32,7 @@ async function seedReadingExercises() {
         content: `I live in a house near the mountains. I have two brothers and one sister, and I was born last. My father teaches mathematics, and my mother is a nurse at a big hospital. My brothers are very smart and work hard in school. My sister is a nervous girl, but she is very kind. My grandmother also lives with us. She came from Italy when I was two years old. She has grown old, but she is still very strong. She cooks the best food!
 My family is very important to me. We do lots of things together. My brothers help me with my homework, and I help them clean the house. My sister helps our mother with the cooking. My father spends a lot of time with us in our backyard. We play football together. My grandmother tells us stories about Italy.
 I love my family very much.`,
-        type: 'READING',
+        type: 'reading',
         moduleId: readingModule.id,
         languageId: english.id,
         levelId: beginnerLevel.id,
@@ -40,7 +40,7 @@ I love my family very much.`,
           create: [
             {
               question: 'Where does the author live?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 'In a house near the mountains',
                 'In a big city',
                 'In Italy',
@@ -50,7 +50,7 @@ I love my family very much.`,
             },
             {
               question: 'What does the father do?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 'He is a doctor',
                 'He teaches mathematics',
                 'He works in a hospital',
@@ -60,7 +60,7 @@ I love my family very much.`,
             },
             {
               question: 'What does the grandmother do for the family?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 'She helps with homework',
                 'She works at the hospital',
                 'She cooks the best food',
@@ -70,7 +70,7 @@ I love my family very much.`,
             },
             {
               question: 'What do they do together as a family?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 'They watch TV',
                 'They play football',
                 'They go to Italy',
@@ -95,7 +95,7 @@ I walk to school because it's very close to my house. School starts at 8:00 am. 
 After school, I do my homework and play with my friends. We like to ride our bikes in the park. I have dinner with my family at 6:00 pm. Then I read a book or watch TV. I go to bed at 9:00 pm.
 
 I like my daily routine!`,
-        type: 'READING',
+        type: 'reading',
         moduleId: readingModule.id,
         languageId: english.id,
         levelId: beginnerLevel.id,
@@ -103,7 +103,7 @@ I like my daily routine!`,
           create: [
             {
               question: 'What time does the author wake up?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 '6:00 am',
                 '6:30 am',
                 '7:00 am',
@@ -113,7 +113,7 @@ I like my daily routine!`,
             },
             {
               question: 'How does the author go to school?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 'By bus',
                 'By car',
                 'By bike',
@@ -123,7 +123,7 @@ I like my daily routine!`,
             },
             {
               question: 'What is the author\'s favorite subject?',
-              optionsJson: JSON.stringify([
+              options: JSON.stringify([
                 'Math',
                 'English',
                 'Science',

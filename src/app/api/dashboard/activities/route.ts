@@ -17,7 +17,7 @@ export async function GET() {
         : { userId: session.user.id },
       take: 10,
       orderBy: {
-        updatedAt: 'desc'
+        finishedAt: 'desc'
       },
       include: {
         user: {

@@ -1,8 +1,9 @@
 'use client'
 
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, PDFDownloadLinkProps } from '@react-pdf/renderer'
 import { Download } from 'lucide-react'
 import type { Exercise } from '@/types/exercise'
+import { ReactElement } from 'react'
 
 const styles = StyleSheet.create({
   page: {
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
   }
 })
 
-function ExercisePDF({ exercise }: { exercise: Exercise }) {
+function ExercisePDF({ exercise }: { exercise: Exercise }): ReactElement {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -64,7 +65,7 @@ function ExercisePDF({ exercise }: { exercise: Exercise }) {
   )
 }
 
-export function ExercisePDFDownload({ exercise }: { exercise: Exercise | null }) {
+export function ExercisePDFDownload({ exercise }: { exercise: Exercise | null }): ReactElement | null {
   if (!exercise) return null
 
   return (
@@ -73,12 +74,10 @@ export function ExercisePDFDownload({ exercise }: { exercise: Exercise | null })
       fileName={`exercicio-${exercise.title.toLowerCase().replace(/\s+/g, '-')}.pdf`}
       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
     >
-      {({ loading }) => (
-        <>
-          <Download className="w-4 h-4 mr-2" />
-          {loading ? 'Gerando PDF...' : 'Baixar PDF'}
-        </>
-      )}
+      <div className="inline-flex items-center">
+        <Download className="w-4 h-4 mr-2" />
+        Baixar PDF
+      </div>
     </PDFDownloadLink>
   )
 } 

@@ -1,6 +1,15 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-export function ProgressChart({ progress }) {
+interface ProgressData {
+  date: string
+  score: number
+}
+
+interface ProgressChartProps {
+  progress: ProgressData[]
+}
+
+export function ProgressChart({ progress }: ProgressChartProps) {
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">

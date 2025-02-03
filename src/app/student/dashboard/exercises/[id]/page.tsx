@@ -104,8 +104,22 @@ export default function ExercisePage({ params }: { params: { id: string } }) {
       
       {exercise.type === 'listening' && (
         <ListeningExercise
-          exercise={exercise}
-          onSubmit={handleSubmit}
+          id={exercise.id}
+          title={exercise.title}
+          description={exercise.description}
+          content={exercise.content}
+          audioUrl={exercise.audioUrl}
+          questions={exercise.questions.map(q => ({
+            ...q,
+            options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+          }))}
+          onComplete={async (score, answers) => {
+            const formattedAnswers = Object.entries(answers).map(([questionId, answer]) => ({
+              questionId,
+              answer
+            }))
+            await handleSubmit(formattedAnswers)
+          }}
         />
       )}
       

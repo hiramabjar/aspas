@@ -4,9 +4,15 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Language, Level, User } from '@prisma/client'
+import { Language, Level, User, StudentProfile, Enrollment } from '@prisma/client'
 
-type Enrollment = {
+type UserWithProfile = User & {
+  studentProfile?: (StudentProfile & {
+    enrollments: Enrollment[]
+  }) | null
+}
+
+type EnrollmentForm = {
   languageId: string
   levelId: string
 }
@@ -25,14 +31,14 @@ type StudentFormData = z.infer<typeof studentSchema>
 
 interface StudentFormProps {
   onSuccess: () => void
-  initialData?: User | null
+  initialData?: UserWithProfile | null
 }
 
 export function StudentForm({ onSuccess, initialData }: StudentFormProps) {
   const [languages, setLanguages] = useState<Language[]>([])
   const [levels, setLevels] = useState<Level[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [enrollments, setEnrollments] = useState<Enrollment[]>(
+  const [enrollments, setEnrollments] = useState<EnrollmentForm[]>(
     initialData?.studentProfile?.enrollments?.map(e => ({
       languageId: e.languageId,
       levelId: e.levelId

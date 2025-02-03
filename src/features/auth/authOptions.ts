@@ -24,6 +24,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Usuário não encontrado')
         }
 
+        if (!user.password) {
+          throw new Error('Senha não definida para este usuário')
+        }
+
         const isPasswordValid = await comparePassword(credentials.password, user.password)
 
         if (!isPasswordValid) {
@@ -59,19 +63,15 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    async redirect({ url, baseUrl, token }) {
+    async redirect({ url, baseUrl }) {
       // Se a URL for relativa, adicione o baseUrl
       const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : url
       
       // Se for uma URL do mesmo site
       if (fullUrl.startsWith(baseUrl)) {
-        // Redireciona para o dashboard apropriado baseado no papel do usuário
-        if (token?.role === 'admin') {
-          return `${baseUrl}/admin/dashboard`
-        }
-        return `${baseUrl}/student/dashboard`
+        return fullUrl
       }
-      return fullUrl
+      return baseUrl
     }
   },
   secret: process.env.NEXTAUTH_SECRET,
